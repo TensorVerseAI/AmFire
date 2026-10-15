@@ -5,7 +5,7 @@ let fullscreenWasActive = false;
 const eventLog = [];
 function record(type, detail={}) { eventLog.push({type,detail,at:new Date().toISOString()}); if(eventLog.length>80)eventLog.shift(); }
 window.amfireDiagnostics = () => eventLog.map(x=>({...x})); // No chat text, profile or tokens.
-fetch('/media.json').then(r=>r.json()).then(m=>{media=m;$('presentationVideo').src=m.opening.src;}).catch(()=>record('media-manifest-fallback'));
+fetch('/media.json').then(r=>r.json()).then(m=>{media=m;}).catch(()=>record('media-manifest-fallback'));
 $('presentationVideo').src=media.opening.src;
 $('presentationVideo').setAttribute('controlslist','nofullscreen nodownload');
 $('year').textContent=new Date().getFullYear();
@@ -22,23 +22,23 @@ videoMenu.innerHTML='<button class="menu-button" id="videoMenuButton" aria-label
 $('presentation').append(videoMenu);
 $('videoMenuButton').onclick=()=>{const open=$('videoOptions').hidden;$('videoOptions').hidden=!open;$('videoMenuButton').setAttribute('aria-expanded',String(open));};
 videoMenu.addEventListener('click',e=>{const action=e.target.closest('[data-video-action]')?.dataset.videoAction;if(!action)return;$('videoOptions').hidden=true;$('videoMenuButton').setAttribute('aria-expanded','false');if(action==='demo')openDemo();if(action==='marketing')exitPresentation();if(action==='install')install();if(action==='settings')openSettings();record('presentation-panel',{action});});
-async function startPresentation(){
- closeMenu();$('presentationEnd').hidden=true;$('presentation').showModal();
- const video=$('presentationVideo');video.currentTime=0;
- const fullscreen=document.documentElement.requestFullscreen?.();
- const playing=video.play();record('presentation-start');
- if(fullscreen)fullscreen.catch(()=>{$('presentationNote').textContent='Full-window preview · use × to explore';record('fullscreen-fallback');});
- else record('fullscreen-unsupported');
- playing.catch(()=>{$('presentationNote').textContent='Tap Play in the video controls to begin.';record('playback-user-action-needed');});
-}
-function exitPresentation(){ $('presentationVideo').pause();if($('presentation').open)$('presentation').close();if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});record('presentation-exit'); }
-$('startButton').onclick=startPresentation;
+let entryPhase='intro';
+const marketing=document.createElement('dialog');marketing.id='marketing';marketing.className='marketing-drawer';marketing.setAttribute('aria-label','Explore AmFire');
+const closeMarketing=document.createElement('button');closeMarketing.className='close';closeMarketing.textContent='Close';closeMarketing.setAttribute('aria-label','Close Explore AmFire');closeMarketing.onclick=()=>marketing.close();marketing.append(closeMarketing);
+for(const el of [document.querySelector('.topbar'),$('main'),document.querySelector('.pull-tab')])marketing.append(el);document.body.append(marketing);
+function showPlaceholder(started=false){entryPhase=started?'presentation':'ready';$('presentation').dataset.phase=entryPhase;$('presentationVideo').pause();$('presentationEnd').hidden=false;$('introPlay').hidden=true;$('presentationStart').hidden=started;$('placeholderTitle').textContent=started?'The full presentation is coming soon.':'Ready for a little surprise?';$('placeholderCopy').textContent=started?'This is the presentation placeholder. Open the menu to explore AmFire or try the public sample.':"Johnny's full presentation is coming soon. Start to enter the presentation preview.";$('presentationNote').textContent=started?'Presentation preview — no full video supplied yet':'Opening complete';record(started?'presentation-start':'opening-ended');}
+async function startPresentation(){closeMenu();if(marketing.open)marketing.close();if(!$('presentation').open)$('presentation').showModal();showPlaceholder(true);document.documentElement.requestFullscreen?.().catch(()=>record('fullscreen-fallback'));if(media.presentation?.src){$('presentationVideo').src=media.presentation.src;$('presentationVideo').muted=false;$('presentationEnd').hidden=true;$('presentationVideo').play().catch(()=>{$('introPlay').hidden=false;});}}
+function exitPresentation(){$('presentationVideo').pause();if(!marketing.open)marketing.showModal();record('marketing-open');}
+function playIntro(){entryPhase='intro';$('presentation').dataset.phase='intro';$('presentationEnd').hidden=true;$('presentationVideo').src=media.opening.src;$('presentationVideo').muted=true;$('presentationVideo').currentTime=0;$('presentationNote').textContent='AmFire opening';$('presentationVideo').play().then(()=>{$('introPlay').hidden=true;record('intro-playing');}).catch(()=>{$('introPlay').hidden=false;record('playback-user-action-needed');});}
+$('startButton').onclick=startPresentation;$('presentationStart').onclick=startPresentation;
 $('closePresentation').onclick=exitPresentation;$('exploreButton').onclick=exitPresentation;
-$('presentation').addEventListener('cancel',()=>{ $('presentationVideo').pause();if(document.fullscreenElement)document.exitFullscreen().catch(()=>{}); });
-document.addEventListener('fullscreenchange',()=>{if(document.fullscreenElement){fullscreenWasActive=true;record('fullscreen-enter');}else if(fullscreenWasActive){fullscreenWasActive=false;exitPresentation();}});
-$('presentationVideo').onended=()=>{$('presentationEnd').hidden=false;record('opening-ended');};
-$('presentationVideo').onerror=()=>{$('presentationNote').textContent='Opening unavailable. You can still explore AmFire from the menu.';record('opening-error');};
-$('replayButton').onclick=()=>{$('presentationEnd').hidden=true;$('presentationVideo').currentTime=0;$('presentationVideo').play().catch(()=>{});};
+$('presentation').addEventListener('cancel',e=>{e.preventDefault();exitPresentation();});
+document.addEventListener('fullscreenchange',()=>record(document.fullscreenElement?'fullscreen-enter':'fullscreen-exit'));
+$('presentationVideo').onended=()=>showPlaceholder(entryPhase==='presentation');
+$('presentationVideo').onerror=()=>{$('presentationNote').textContent='Opening unavailable. Use the menu to explore.';$('introPlay').hidden=false;record('opening-error');};
+$('introPlay').onclick=()=>{$('presentationVideo').play().then(()=>{$('introPlay').hidden=true;}).catch(()=>record('playback-blocked'));};
+$('replayButton').onclick=playIntro;
+if(!['/app','/app/'].includes(location.pathname)){$('presentation').showModal();playIntro();}
 function openDemo(){closeMenu();$('presentationVideo').pause();if(!$('demo').open)$('demo').showModal();if(!$('chat').children.length)resetDemo();record('demo-open');}
 document.querySelectorAll('[data-demo]').forEach(b=>b.onclick=openDemo);
 $('closeDemo').onclick=()=>{$('demo').close();$('demo').querySelectorAll('video').forEach(v=>v.pause());};
@@ -66,7 +66,8 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installProm
 window.addEventListener('appinstalled',()=>{installPrompt=null;toast('AmFire installed. Open the app from your home screen.');record('app-installed');});
 async function install(){closeMenu();if(installPrompt){await installPrompt.prompt();const result=await installPrompt.userChoice;record('install-choice',{outcome:result.outcome});installPrompt=null;}else{const ios=/iPad|iPhone|iPod/.test(navigator.userAgent);$('installInstructions').textContent=ios?'In Safari, tap Share, then Add to Home Screen. Other browsers may offer this in their menu. You can also keep using the public website.':'Open your browser menu and look for “Install AmFire” or “Add to Home screen”. If your browser does not support installation, the public website still works.';openSettings(true);}}
 $('installButton').onclick=install;
-if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>record('offline-cache-unavailable'));
+if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>record('offline-cache-unavailable'));
 async function appGate(){if(!['/app','/app/'].includes(location.pathname))return;$('appGate').showModal();try{const config=await fetch('/api/config').then(r=>r.json());const profile=config.amazonConfigured?await fetch('/api/me').then(async r=>({ok:r.ok,data:await r.json()})):{ok:false};if(profile.ok){$('authStatus').textContent='Signed in securely with Amazon.';$('amazonLogin').hidden=true;$('privateContent').hidden=false;$('profileName').textContent=`Welcome, ${profile.data.name || 'thoughtful human'}.`;return;}if(!config.amazonConfigured){$('authStatus').textContent='Private sign-in is not connected yet. The public demo is open to everyone.';$('amazonLogin').setAttribute('aria-disabled','true');$('amazonLogin').removeAttribute('href');}else $('authStatus').textContent='Sign in to enter your private app. We request your Amazon profile and email only.';}catch{$('authStatus').textContent='Private sign-in needs an online connection. The public sample is still available.';$('amazonLogin').setAttribute('aria-disabled','true');$('amazonLogin').removeAttribute('href');}}
 $('logoutButton').onclick=async()=>{try{await fetch('/auth/logout',{method:'POST',headers:{'X-AmFire-Action':'logout'}});location.assign('/');}catch{toast('Could not sign out. Reconnect and try again.');}};
 appGate();
+for(const panel of [marketing,$('demo'),$('settings')])panel.addEventListener('close',()=>{if(entryPhase==='intro'&&!$('presentationVideo').ended)$('presentationVideo').play().catch(()=>{$('introPlay').hidden=false;});});
