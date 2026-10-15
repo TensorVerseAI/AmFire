@@ -1,0 +1,25 @@
+{
+  "id": "/app",
+  "name": "AmFire — Surprise, surprise.",
+  "short_name": "AmFire",
+  "description": "A little wish. A lovely surprise. Explore the AmFire product discovery demo.",
+  "start_url": "/app/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f8fc",
+  "theme_color": "#133ad6",
+  "icons": [
+    {
+      "type": "image/png",
+      "sizes": "192x192",
+      "src": "/assets/icon-192.png",
+      "purpose": "any maskable"
+    },
+    {
+      "type": "image/png",
+      "sizes": "512x512",
+      "src": "/assets/icon-512.png",
+      "purpose": "any maskable"
+    }
+  ]
+}

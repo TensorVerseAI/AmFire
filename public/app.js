@@ -1,0 +1,72 @@
+const $ = (id) => document.getElementById(id);
+let media = {opening:{src:'/assets/amfire-opening.mp4'},sample:{src:'/assets/amfire-opening.mp4'}};
+let installPrompt = null;
+let fullscreenWasActive = false;
+const eventLog = [];
+function record(type, detail={}) { eventLog.push({type,detail,at:new Date().toISOString()}); if(eventLog.length>80)eventLog.shift(); }
+window.amfireDiagnostics = () => eventLog.map(x=>({...x})); // No chat text, profile or tokens.
+fetch('/media.json').then(r=>r.json()).then(m=>{media=m;$('presentationVideo').src=m.opening.src;}).catch(()=>record('media-manifest-fallback'));
+$('presentationVideo').src=media.opening.src;
+$('presentationVideo').setAttribute('controlslist','nofullscreen nodownload');
+$('year').textContent=new Date().getFullYear();
+function toast(text){$('toast').textContent=text;$('toast').hidden=false;setTimeout(()=>$('toast').hidden=true,6000);}
+function closeMenu(){$('menu').hidden=true;$('menuButton').setAttribute('aria-expanded','false');}
+$('menuButton').onclick=()=>{const open=$('menu').hidden;$('menu').hidden=!open;$('menuButton').setAttribute('aria-expanded',String(open));};
+document.addEventListener('click',e=>{if(!e.target.closest('.topbar'))closeMenu();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
+$('menu').addEventListener('click',e=>{if(e.target.closest('a,button'))closeMenu();});
+
+// Fullscreen the app shell, never the video: overlay navigation and panels remain available.
+const videoMenu=document.createElement('div');videoMenu.className='video-menu';
+videoMenu.innerHTML='<button class="menu-button" id="videoMenuButton" aria-label="Presentation options" aria-expanded="false" aria-controls="videoOptions"><span></span><span></span><span></span></button><div id="videoOptions" hidden><button data-video-action="demo">Try the interactive sample ↗</button><button data-video-action="marketing">Explore AmFire →</button><button data-video-action="install">Install the app ↓</button><button data-video-action="settings">Settings & privacy</button><a href="https://github.com/TensorVerseAI/AmFire" target="_blank" rel="noopener noreferrer">Public repository ↗</a></div>';
+$('presentation').append(videoMenu);
+$('videoMenuButton').onclick=()=>{const open=$('videoOptions').hidden;$('videoOptions').hidden=!open;$('videoMenuButton').setAttribute('aria-expanded',String(open));};
+videoMenu.addEventListener('click',e=>{const action=e.target.closest('[data-video-action]')?.dataset.videoAction;if(!action)return;$('videoOptions').hidden=true;$('videoMenuButton').setAttribute('aria-expanded','false');if(action==='demo')openDemo();if(action==='marketing')exitPresentation();if(action==='install')install();if(action==='settings')openSettings();record('presentation-panel',{action});});
+async function startPresentation(){
+ closeMenu();$('presentationEnd').hidden=true;$('presentation').showModal();
+ const video=$('presentationVideo');video.currentTime=0;
+ const fullscreen=document.documentElement.requestFullscreen?.();
+ const playing=video.play();record('presentation-start');
+ if(fullscreen)fullscreen.catch(()=>{$('presentationNote').textContent='Full-window preview · use × to explore';record('fullscreen-fallback');});
+ else record('fullscreen-unsupported');
+ playing.catch(()=>{$('presentationNote').textContent='Tap Play in the video controls to begin.';record('playback-user-action-needed');});
+}
+function exitPresentation(){ $('presentationVideo').pause();if($('presentation').open)$('presentation').close();if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});record('presentation-exit'); }
+$('startButton').onclick=startPresentation;
+$('closePresentation').onclick=exitPresentation;$('exploreButton').onclick=exitPresentation;
+$('presentation').addEventListener('cancel',()=>{ $('presentationVideo').pause();if(document.fullscreenElement)document.exitFullscreen().catch(()=>{}); });
+document.addEventListener('fullscreenchange',()=>{if(document.fullscreenElement){fullscreenWasActive=true;record('fullscreen-enter');}else if(fullscreenWasActive){fullscreenWasActive=false;exitPresentation();}});
+$('presentationVideo').onended=()=>{$('presentationEnd').hidden=false;record('opening-ended');};
+$('presentationVideo').onerror=()=>{$('presentationNote').textContent='Opening unavailable. You can still explore AmFire from the menu.';record('opening-error');};
+$('replayButton').onclick=()=>{$('presentationEnd').hidden=true;$('presentationVideo').currentTime=0;$('presentationVideo').play().catch(()=>{});};
+function openDemo(){closeMenu();$('presentationVideo').pause();if(!$('demo').open)$('demo').showModal();if(!$('chat').children.length)resetDemo();record('demo-open');}
+document.querySelectorAll('[data-demo]').forEach(b=>b.onclick=openDemo);
+$('closeDemo').onclick=()=>{$('demo').close();$('demo').querySelectorAll('video').forEach(v=>v.pause());};
+$('demo').addEventListener('close',()=>{$('demo').querySelectorAll('video').forEach(v=>v.pause());});
+function message(text,kind='bot'){const el=document.createElement('div');el.className='message '+kind;const p=document.createElement('p');p.textContent=text;el.append(p);$('chat').append(el);$('chat').scrollTop=$('chat').scrollHeight;return el;}
+function resetDemo(){$('chat').replaceChildren();message('Hey, thoughtful human. Jamie just dropped a little hint: “That orange bag would be perfect for our next adventure.”');message('This is a synthetic wish. Want to see the illustrated scene, watch our opening clip, or explore a similar bag?');record('demo-reset');}
+$('resetDemo').onclick=resetDemo;
+function scene(){const el=message('Here’s the illustrative moment. An orange backpack sits on a wooden bench. Brand, model and size cannot be verified from this artwork.');el.insertAdjacentHTML('beforeend','<img class="chat-scene" src="/assets/scene.svg" alt="Synthetic scene: orange backpack on a wooden bench"><p class="micro">Synthetic scene · demo-scene-001 · illustrative position 00:12<br>No Fire TV capture or NVIDIA inference has occurred.</p>');scrollChat();record('demo-scene');}
+function clip(){const el=message('Here’s the real AmFire opening. The product scene is a separate illustration, not an identified object in this brand clip.');const v=document.createElement('video');v.src=media.sample.src;v.controls=true;v.playsInline=true;v.preload='metadata';el.append(v);scrollChat();record('demo-clip');}
+function match(){const el=message('Let’s look for a similar orange daypack. This is a category suggestion, not an exact visual match or a live catalog result.');el.insertAdjacentHTML('beforeend','<div class="chat-card"><img src="/assets/scene.svg" alt="Illustrative orange backpack, not a product photograph"><div class="card-copy"><p class="micro">ILLUSTRATIVE MATCH</p><h3>Orange everyday backpack</h3><p>Price, brand, size and stock: check on Amazon.</p><a href="https://www.amazon.com/s?k=orange+daypack+backpack" target="_blank" rel="noopener noreferrer">Explore real products on Amazon ↗</a><button type="button" class="review-button">Review the gift idea</button></div></div>');el.querySelector('button').onclick=review;scrollChat();record('demo-match');}
+function review(){const el=message('A thoughtful pause before you buy. Try the checklist below; all values stay in this tab.');el.insertAdjacentHTML('beforeend','<form class="chat-card gift-review"><div class="card-copy"><h3>Gift idea · demo only</h3><label>Recipient<input name="recipient" required maxlength="40" value="Jamie"></label><label>Size / capacity<input name="size" required maxlength="40" placeholder="e.g. 20 litres — verify listing"></label><label>Budget (USD, not a live price)<input name="budget" type="number" min="1" max="10000" required placeholder="Your budget"></label><label><input name="reviewed" type="checkbox" required style="width:auto"> I’ll confirm the listing, price and delivery on Amazon.</label><button type="submit">Confirm demo checklist</button></div></form>');el.querySelector('form').onsubmit=e=>{e.preventDefault();const data=new FormData(e.target);message(`Demo checklist ready for ${data.get('recipient')}: ${data.get('size')}, budget $${Number(data.get('budget')).toFixed(2)}. No order was placed. Follow the Amazon link above to choose and purchase yourself.`);record('demo-checklist-confirmed');};scrollChat();record('demo-review');}
+function delivery(){message('Imagine the next chapter: the gift arrives, a Ring event lets you know, and their reaction makes your day. This is a simulated story step. No Ring device, recording, notification or order is connected.');record('demo-delivery-simulated');}
+function scrollChat(){requestAnimationFrame(()=>$('chat').scrollTop=$('chat').scrollHeight);}
+function respond(text){const q=text.toLowerCase();message(text,'user');if(/video|play|watch|clip/.test(q))clip();else if(/scene|image|moment|see/.test(q))scene();else if(/buy|order|confirm|size|recipient|review/.test(q))review();else if(/deliver|ring|reaction|surprise/.test(q))delivery();else if(/bag|match|find|product|price|backpack/.test(q))match();else message('I’m a scripted sample, so I can show the scene, play the opening, find a similar bag, review a gift idea, or explain the delivery story. Try one of those.');scrollChat();}
+$('chatForm').onsubmit=e=>{e.preventDefault();const text=$('chatInput').value.trim();if(!text)return;$('chatInput').value='';respond(text);};
+document.querySelectorAll('[data-prompt]').forEach(b=>b.onclick=()=>respond(b.dataset.prompt));
+for(const [label,prompt]of [['Watch clip','Play the clip'],['Gift checklist','Review the gift'],['Delivery story','Show the delivery story']]){const b=document.createElement('button');b.textContent=label;b.onclick=()=>respond(prompt);$('suggestions').append(b);}
+function openSettings(installing=false){closeMenu();$('installHelp').hidden=!installing;if(!$('settings').open)$('settings').showModal();}
+$('settingsButton').onclick=()=>openSettings();$('privacyButton').onclick=()=>openSettings();$('closeSettings').onclick=()=>$('settings').close();
+try{$('reduceMotion').checked=localStorage.getItem('amfire.reduceMotion')==='true';}catch{}
+document.body.classList.toggle('reduce-motion',$('reduceMotion').checked);
+$('reduceMotion').onchange=e=>{document.body.classList.toggle('reduce-motion',e.target.checked);try{localStorage.setItem('amfire.reduceMotion',String(e.target.checked));}catch{}};
+$('clearData').onclick=async()=>{try{localStorage.removeItem('amfire.reduceMotion');}catch{}$('reduceMotion').checked=false;document.body.classList.remove('reduce-motion');resetDemo();$('settingsStatus').textContent='Demo settings and conversation cleared.';};
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;record('install-prompt-available');});
+window.addEventListener('appinstalled',()=>{installPrompt=null;toast('AmFire installed. Open the app from your home screen.');record('app-installed');});
+async function install(){closeMenu();if(installPrompt){await installPrompt.prompt();const result=await installPrompt.userChoice;record('install-choice',{outcome:result.outcome});installPrompt=null;}else{const ios=/iPad|iPhone|iPod/.test(navigator.userAgent);$('installInstructions').textContent=ios?'In Safari, tap Share, then Add to Home Screen. Other browsers may offer this in their menu. You can also keep using the public website.':'Open your browser menu and look for “Install AmFire” or “Add to Home screen”. If your browser does not support installation, the public website still works.';openSettings(true);}}
+$('installButton').onclick=install;
+if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>record('offline-cache-unavailable'));
+async function appGate(){if(!['/app','/app/'].includes(location.pathname))return;$('appGate').showModal();try{const config=await fetch('/api/config').then(r=>r.json());const profile=config.amazonConfigured?await fetch('/api/me').then(async r=>({ok:r.ok,data:await r.json()})):{ok:false};if(profile.ok){$('authStatus').textContent='Signed in securely with Amazon.';$('amazonLogin').hidden=true;$('privateContent').hidden=false;$('profileName').textContent=`Welcome, ${profile.data.name || 'thoughtful human'}.`;return;}if(!config.amazonConfigured){$('authStatus').textContent='Private sign-in is not connected yet. The public demo is open to everyone.';$('amazonLogin').setAttribute('aria-disabled','true');$('amazonLogin').removeAttribute('href');}else $('authStatus').textContent='Sign in to enter your private app. We request your Amazon profile and email only.';}catch{$('authStatus').textContent='Private sign-in needs an online connection. The public sample is still available.';$('amazonLogin').setAttribute('aria-disabled','true');$('amazonLogin').removeAttribute('href');}}
+$('logoutButton').onclick=async()=>{try{await fetch('/auth/logout',{method:'POST',headers:{'X-AmFire-Action':'logout'}});location.assign('/');}catch{toast('Could not sign out. Reconnect and try again.');}};
+appGate();
