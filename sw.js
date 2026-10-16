@@ -1,4 +1,4 @@
-const CACHE='amfire-shell-v5-entry';
+const CACHE='amfire-shell-v6-stage';
 const SHELL=['/assets/amfire-owner-logo.png','/','/app/','/index.html','/style.css','/app.js','/media.json','/manifest.webmanifest','/assets/icon-192.png','/assets/icon-512.png','/assets/icon.svg','/assets/icon-maskable.svg','/assets/scene.svg','/assets/amfire-opening.mp4'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL.map(url=>new Request(url,{cache:'reload'})))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('amfire-shell-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()).then(()=>self.clients.matchAll({type:'window'})).then(clients=>{for(const client of clients)client.navigate(client.url).catch(()=>{});})));
