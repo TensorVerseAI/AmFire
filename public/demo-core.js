@@ -1,8 +1,8 @@
 export const catalog=[
- {id:'bag',name:'Sunset daypack',recipient:'Jamie',size:'18 litre',price:39,quote:'That orange bag would be perfect for our next adventure.',color:'#ff802b',kind:'bag'},
+ {id:'dress',name:'Red evening dress',recipient:'Jamie',size:'M',price:49.99,quote:'I would love a red dress like that for our next evening out.',color:'#b9192b',kind:'dress'},
  {id:'headphones',name:'Cloud headphones',recipient:'Alex',size:'Adjustable',price:59,quote:'I would love some headphones for the train.',color:'#456be8',kind:'headphones'},
  {id:'bottle',name:'Trail bottle',recipient:'Sam',size:'750 ml',price:24,quote:'A bottle that keeps my water cold would be great.',color:'#15a99a',kind:'bottle'}];
-export function initial(){return {stage:'connect',bee:false,item:'bag',orders:[]};}
+export function initial(){return {stage:'connect',bee:false,item:'dress',orders:[]};}
 export function transition(s,event){
  if(event.type==='RESET')return initial();
  if(event.type==='CONNECT'&&s.stage==='connect')return {...s,stage:'onboard'};

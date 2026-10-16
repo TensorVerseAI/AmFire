@@ -8,9 +8,15 @@ Browser voice is optional, initiated by the microphone button with an explicit c
 
 `public/demo-core.js` is the shared transition model. Invalid transitions and repeat confirmation are ignored. `public/demo.js` renders the interface. All state stays in memory; reload/restart resets. The service worker caches the application shell. No retail order, payment, push notification, account connection or model call occurs.
 
-## Replaceable delivery media
+## Supplied demo media (v15)
 
-Replace `/assets/demo-delivery.webm` with Johnny's approved clip (or update its source in `public/demo.js` and the service-worker cache list). Keep the placeholder disclosure until replaced, and label a supplied recording as a recorded demo clip unless an actual Ring integration is independently verified. Increment the cache version on release. Do not imply the app caused camera recording.
+The first wish is a red evening dress, size M, with a $49.99 illustrative price drawn from the supplied cart artwork. The recognition clip, cart artwork and doorstep story are user-authorized public demonstration media. They do not establish an exact product match, live price, payment method, shipping address, Ring recording or an actual purchase.
+
+- /assets/demo-dress.mp4: five seconds, 1280×720; no decoded audio observed. The baked-in 98% match is a graphic, not measured inference.
+- /assets/demo-cart.png: original supplied AmFire checkout illustration. Its shipping/payment details are static artwork. The form below controls the simulated recipient and size.
+- /assets/demo-doorstep.mp4: 22.5 seconds, 1280×720, audio track observed; supplied family doorstep story. Replaces the original placeholder in the shared app.
+
+Both clips have playback, replay and expansion controls. The cart image expands. These assets are cached for offline use with video byte-range responses. The main 143.915-second site presentation and six-second intro are unchanged by v15.
 
 ## Verification
 
@@ -23,7 +29,7 @@ The existing cinema retains Start/fullscreen, Escape/minimize, the persistent Ex
 - Login with Amazon: optional browser adapter and mocked contract tests exist; configuration disabled. No developer client/profile verified. The interactive demo has no dependency on it.
 - Alexa: actual `ask-sdk-core@2.14.0` installed in the separate private workspace; three synthetic SDK invocation tests passed. No skill deployment or shopping call. This does not prove Alexa+ integration.
 - NVIDIA: no new model calls. Catalog matching is simulated.
-- Bee/Ring: no live connection; synthetic wishes and original delivery animation.
+- Bee/Ring: no live connection; synthetic wishes and supplied recorded demo media.
 - Android SDK/ADB and cached Gradle are available. Connected Amazon device reports `tablet`, Android 11; other connected devices are phone/generic Android/Wear emulators. No verified Fire TV/Vega runtime.
 - Vega SDK is not installed; its documented macOS/Ubuntu environment has not been established on this Windows host.
 
