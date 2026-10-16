@@ -1,3 +1,4 @@
+if(!document.getElementById('skipIntro')){location.replace(location.pathname+'?release=stage7');}else{
 const $ = (id) => document.getElementById(id);
 let media = {opening:{src:'/assets/amfire-opening.mp4'},sample:{src:'/assets/amfire-opening.mp4'}};
 let installPrompt = null;
@@ -75,3 +76,5 @@ if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js',{update
 async function appGate(){if(!['/app','/app/'].includes(location.pathname))return;$('appGate').showModal();try{const config=await fetch('/api/config').then(r=>r.json());const profile=config.amazonConfigured?await fetch('/api/me').then(async r=>({ok:r.ok,data:await r.json()})):{ok:false};if(profile.ok){$('authStatus').textContent='Signed in securely with Amazon.';$('amazonLogin').hidden=true;$('privateContent').hidden=false;$('profileName').textContent=`Welcome, ${profile.data.name || 'thoughtful human'}.`;return;}if(!config.amazonConfigured){$('authStatus').textContent='Private sign-in is not connected yet. The public demo is open to everyone.';$('amazonLogin').setAttribute('aria-disabled','true');$('amazonLogin').removeAttribute('href');}else $('authStatus').textContent='Sign in to enter your private app. We request your Amazon profile and email only.';}catch{$('authStatus').textContent='Private sign-in needs an online connection. The public sample is still available.';$('amazonLogin').setAttribute('aria-disabled','true');$('amazonLogin').removeAttribute('href');}}
 $('logoutButton').onclick=async()=>{try{await fetch('/auth/logout',{method:'POST',headers:{'X-AmFire-Action':'logout'}});location.assign('/');}catch{toast('Could not sign out. Reconnect and try again.');}};
 appGate();
+
+}
