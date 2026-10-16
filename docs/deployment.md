@@ -1,6 +1,6 @@
 # Deployment
 
-Public repository target: `TensorVerseAI/AmFire`. Existing CLI identity Gio300 has active admin membership in TensorVerseAI; the narrower connector's empty organization list was not authoritative for CLI access.
+Public repository: `TensorVerseAI/AmFire`. Public site: https://amfires.com/ on GitHub Pages.
 
 Public hosting candidate: GitHub Pages for the public synthetic demo only, on a branch containing `public/`. This avoids introducing paid infrastructure or modifying another project's host. Private server routes remain unavailable until an approved Node host and LWA configuration exist. Do not treat display-mode or a static app page as authentication.
 
@@ -9,3 +9,4 @@ GoDaddy authoritative nameservers: ns37.domaincontrol.com / ns38.domaincontrol.c
 No existing AmFire-specific S3, Amplify or CloudFront host was found in inspected account inventory. No unrelated host was repurposed and no paid infrastructure was created.
 
 Production Node hosting should bind an explicitly chosen interface behind HTTPS, set PUBLIC_ORIGIN exactly, and keep client secrets out of the repository. The local server intentionally binds loopback. Before scaling beyond one process, use approved shared session storage and ingress rate limits. No session data survives restart.
+

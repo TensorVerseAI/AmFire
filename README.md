@@ -12,11 +12,11 @@ npm run check
 npm test
 ```
 
-Open http://localhost:4173. Start requests fullscreen on the application shell, keeping the options menu visible over the video. Options open sliding panels. Leaving fullscreen reveals the marketing page. Unsupported browsers receive a full-window player. Replay is manual; there is no idle replay timer.
+Open http://localhost:4173. Start requests fullscreen on the application shell, keeping the options menu visible over the video. Skip intro goes directly to the presentation stage. The visible side tab and navigation open the explanation page, pause/mute the video, and show a replay thumbnail. Leaving fullscreen does the same. Unsupported browsers receive a full-window player. Replay is manual; there is no idle replay timer.
 
 ## Media
 
-`public/media.json` selects the opening and sample video. The included owner-supplied `amfire-opening.mp4` is the six-second opening, not the final commercial. Replace the manifest source/title/description and preview status when the final presentation arrives. `scene.svg` is original synthetic artwork, not a captured Fire TV frame or a photo of a real product.
+`public/media.json` selects opening, presentation and sample media. `presentation.src` is null until the commercial is supplied. Start or Skip requests playback with sound when configured; browser rejection presents an explicit play control. The included owner-supplied `amfire-opening.mp4` is the six-second opening, not the final commercial. Replace the manifest source/title/description and preview status when the final presentation arrives. `scene.svg` is original synthetic artwork, not a captured Fire TV frame or a photo of a real product.
 
 ## Integration boundaries
 
@@ -28,10 +28,16 @@ The sample is scripted, uses synthetic data and sends no messages to a model. It
 
 Public pages, sample and installation require no login. `/app` shows a private-app sign-in gate. `/api/me` requires a server-side session regardless of browser display mode. Optional Login with Amazon uses authorization code + PKCE S256, cookie-bound one-use state, server token exchange, audience/expiry verification and a short-lived HttpOnly session. Provider tokens are discarded; only user ID/name/email are retained in memory for one hour. Restarting the server signs users out. No MFA attestation is inferred.
 
-Set `PUBLIC_ORIGIN`, `AMAZON_CLIENT_ID` and `AMAZON_CLIENT_SECRET` only through approved server configuration. Register the exact `https://amfires.com/auth/callback` redirect. Do not create credentials or grants merely to run the demo. Missing config fails closed. Public static hosting runs only the public demo: server authentication requires a separately approved Node host. No API or auth response is service-worker cached.
+Set `PUBLIC_ORIGIN`, `AMAZON_CLIENT_ID` and `AMAZON_CLIENT_SECRET` only through approved server configuration. Register the exact HTTPS callback on the approved private backend origin; static Pages cannot handle it. Do not create credentials or grants merely to run the demo. Missing config fails closed. Public static hosting runs only the public demo: server authentication requires a separately approved Node host. No API or auth response is service-worker cached.
 
 ## Release and review
 
-See `docs/endpoints.md`, `docs/review-plan.md`, and `docs/deployment.md`. Tests use synthetic OAuth responses and make no provider calls. Independent NVIDIA review is limited to the parent-coordinated six-image allowance; this repository contains no provider credentials and does not invoke the shared helper.
+See `docs/endpoints.md`, `docs/review-plan.md`, and `docs/deployment.md`. Tests use synthetic OAuth responses and make no provider calls. This repository contains no provider credentials or live inference calls.
 
-Code: MIT. Brand/video ownership exceptions: LICENSE. Google Fonts are served remotely (DM Sans and Manrope, SIL Open Font License); system fonts are fallbacks. No analytics SDK or private project code is included.
+Code: MIT. Brand/video ownership exceptions: BRANDING.md. Google Fonts are served remotely (DM Sans and Manrope, SIL Open Font License); system fonts are fallbacks. No analytics SDK or private project code is included.
+
+## Competition and repository ownership
+
+Official project: https://github.com/TensorVerseAI/AmFire. See [competition information](docs/competition.md) and [public/private boundaries](docs/repository-boundaries.md).
+
+

@@ -1,1 +1,19 @@
-{"opening":{"src":"/assets/amfire-opening.mp4","title":"AmFire — opening preview","description":"Johnny’s six-second brand opening. Full presentation coming soon.","isPreview":true},"sample":{"src":"/assets/amfire-opening.mp4","title":"AmFire brand opening","description":"Playable brand clip. Product scene below is a separate synthetic illustration, not a frame identified in this clip."},"repository":"https://github.com/TensorVerseAI/AmFire"}
+{
+  "opening": {
+    "src": "/assets/amfire-opening.mp4",
+    "title": "AmFire — opening preview",
+    "description": "AmFire six-second brand opening.",
+    "isPreview": true
+  },
+  "sample": {
+    "src": "/assets/amfire-opening.mp4",
+    "title": "AmFire brand opening",
+    "description": "Playable brand clip. Product scene below is a separate synthetic illustration, not a frame identified in this clip."
+  },
+  "repository": "https://github.com/TensorVerseAI/AmFire",
+  "presentation": {
+    "src": null,
+    "title": "AmFire. Surprise, surprise.",
+    "description": "Fire TV, Bee, Alexa and Ring bring a thoughtful gift journey together."
+  }
+}
