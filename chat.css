@@ -4,3 +4,7 @@
 .demo-success{text-align:center;padding:24px 12px;color:#fff}.demo-success span{display:block;font-size:100px;line-height:1.2;color:#58dfad}.demo-success strong{font-size:24px}.demo-success p{font-size:14px}#serviceStates{padding-left:20px;line-height:1.8}.chat-tools[hidden],.composer[hidden],.suggestions[hidden]{display:none}
 
 .header-logo{display:block;width:120px;height:54px;overflow:hidden;border-radius:10px;background:white}.header-logo img{display:block;width:420px;max-width:none;height:auto;position:relative;left:50%;top:50%;transform:translate(-50%,-50%)}
+
+.full-demo{display:flex;flex-direction:column;overflow:hidden}.full-demo:not([open]){display:none}.full-demo .phone,.full-demo .demo-disclosure,.full-demo .drawer-top>div{display:none}.full-demo .drawer-top{min-height:38px;height:38px;padding:0 12px;justify-content:flex-end;flex-shrink:0}.full-demo .drawer-top .close{position:static}.full-demo iframe{border:0;width:100%;flex:1;min-height:0;background:#f7f9fe}.full-demo .presentation-tab{z-index:5}
+
+.demo-drawer.full-demo{padding:0;background:#f7f9fe}.full-demo .drawer-top{background:#f7f9fe}.full-demo .drawer-top .close{background:#e9effa;color:#143374;width:30px;height:30px;font-size:18px}

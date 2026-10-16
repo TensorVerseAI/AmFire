@@ -3,7 +3,7 @@ const $ = (id) => document.getElementById(id);
 let media = {opening:{src:'/assets/amfire-opening.mp4'},sample:{src:'/assets/amfire-opening.mp4'}};
 let installPrompt = null;
 let appInstalled=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
-function updateInstallButton(){ $('getAppButton').textContent=appInstalled?'App installed':'Get the app';$('getAppButton').disabled=appInstalled;}
+function updateInstallButton(){ $('getAppButton').textContent=appInstalled?'App installed':'Get the app';$('getAppButton').disabled=appInstalled;$('installButton').textContent=appInstalled?'App installed':'Install AmFire';$('installButton').disabled=appInstalled;}
 updateInstallButton();matchMedia('(display-mode: standalone)').addEventListener('change',e=>{appInstalled=e.matches;updateInstallButton();});
 let fullscreenWasActive = false;
 const eventLog = [];
@@ -51,7 +51,7 @@ video.onerror=()=>{$('presentationNote').textContent='Video unavailable. Explore
 $('introPlay').onclick=()=>{if(entryPhase==='presentation')video.muted=false;video.play().then(()=>{$('introPlay').hidden=true;}).catch(()=>record('playback-blocked'));};
 $('replayButton').onclick=playIntro;
 if(!['/app','/app/'].includes(location.pathname)){$('presentation').showModal();playIntro();}
-function openDemo(){closeMenu();exitPresentation();if(!$('demo').open)$('demo').showModal();moveTab($('demo'));if(!$('chat').children.length)resetDemo();record('demo-open');}
+function openDemo(){closeMenu();exitPresentation();if(!$('demo').open)$('demo').showModal();moveTab($('demo'));record('demo-open');}
 document.querySelectorAll('[data-demo]').forEach(b=>b.onclick=openDemo);
 $('closeDemo').onclick=()=>{$('demo').close();$('demo').querySelectorAll('video').forEach(v=>v.pause());};
 $('demo').addEventListener('close',()=>{moveTab(marketing.open?marketing:$('presentation'));$('demo').querySelectorAll('video').forEach(v=>v.pause());});
@@ -83,6 +83,7 @@ async function appGate(){if(!['/app','/app/'].includes(location.pathname))return
 $('logoutButton').onclick=async()=>{try{await fetch('/auth/logout',{method:'POST',headers:{'X-AmFire-Action':'logout'}});location.assign('/');}catch{toast('Could not sign out. Reconnect and try again.');}};
 appGate();
 
+window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===$('demoFrame').contentWindow&&e.data==='amfire:close')$('closeDemo').click();});
+$('demo').addEventListener('close',()=>$('demoFrame').contentWindow.postMessage('amfire:pause',location.origin));
+
 }
-
-
