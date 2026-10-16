@@ -51,7 +51,7 @@ video.onerror=()=>{$('presentationNote').textContent='Video unavailable. Explore
 $('introPlay').onclick=()=>{if(entryPhase==='presentation')video.muted=false;video.play().then(()=>{$('introPlay').hidden=true;}).catch(()=>record('playback-blocked'));};
 $('replayButton').onclick=playIntro;
 if(!['/app','/app/'].includes(location.pathname)){$('presentation').showModal();playIntro();}
-function openDemo(){closeMenu();exitPresentation();if(!$('demo').open)$('demo').showModal();moveTab($('demo'));record('demo-open');}
+function openDemo(){closeMenu();exitPresentation();if(!$('demo').open)$('demo').showModal();moveTab($('demo'));$('demoFrame').contentWindow.postMessage('amfire:open',location.origin);record('demo-open');}
 document.querySelectorAll('[data-demo]').forEach(b=>b.onclick=openDemo);
 $('closeDemo').onclick=()=>{$('demo').close();$('demo').querySelectorAll('video').forEach(v=>v.pause());};
 $('demo').addEventListener('close',()=>{moveTab(marketing.open?marketing:$('presentation'));$('demo').querySelectorAll('video').forEach(v=>v.pause());});

@@ -6,7 +6,10 @@ export function initial(){return {stage:'connect',bee:false,item:'dress',orders:
 export function transition(s,event){
  if(event.type==='RESET')return initial();
  if(event.type==='CONNECT'&&s.stage==='connect')return {...s,stage:'onboard'};
- if(event.type==='BEE'&&s.stage==='onboard')return {...s,bee:true,stage:'wish'};
+ if(event.type==='INTRO'&&s.stage==='onboard')return {...s,stage:'bee'};
+ if(event.type==='PAIR'&&s.stage==='bee')return {...s,stage:'pairing'};
+ if(event.type==='CANCEL_PAIR'&&s.stage==='pairing')return {...s,stage:'bee'};
+ if(event.type==='BEE'&&s.stage==='pairing')return {...s,bee:true,stage:'wish'};
  if(event.type==='MATCH'&&s.stage==='wish')return {...s,stage:'match'};
  if(event.type==='REVIEW'&&s.stage==='match')return {...s,stage:'review'};
  if(event.type==='CONFIRM'&&s.stage==='review'&&event.recipient&&event.size)return {...s,stage:'ordered',orders:[...s.orders,{id:'DEMO-'+(s.orders.length+1),item:s.item,recipient:event.recipient,size:event.size}]};

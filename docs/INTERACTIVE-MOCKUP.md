@@ -36,3 +36,13 @@ The existing cinema retains Start/fullscreen, Escape/minimize, the persistent Ex
 Competition Fire TV proof remains separate: the rules require execution on Fire OS/Vega hardware or the named Fire TV/Vega simulator and demonstration in the submission video. A desktop PWA or generic Android emulator does not satisfy that evidence requirement. No runtime eligibility claim is made.
 
 No paid service, credentials, new grants, real purchases or shared Docker/security changes were used for this mockup.
+
+## Conversational experience (v16)
+
+The shared app now starts with a short day-check-in. A reply chooses an encouraging or cheerful scripted branch, followed by a cancelable Bee search/pair/connected simulation. Nothing connects to Bluetooth or Bee. After the wish, flexible affirmative replies or the visible choices reveal the dress; the cart and delivery remain unavailable until their stages. Delivery starts with “I have something to make you feel better.” followed by “Hey, I have a nice video of your delivery.”
+
+Assistant messages type in a short ordered queue. Skip typing and system reduced-motion preferences show text immediately; reduced motion also suppresses inline media autoplay. Restart invalidates pending replies and pairing timers. Closing the drawer pauses media and stops voice; reopening preserves the conversation without duplicating messages or restarting clips. Inline clips autoplay muted once when revealed, with discreet sound, expand, replay and pause controls.
+
+The login screen offers the existing fictional account and optional made-up name/code inputs. It explicitly warns against real passwords, accepts arbitrary dummy values, clears them before continuing, and neither sends, persists nor logs them. It is not Amazon authentication.
+
+The app attempts a browser-spoken demo welcome and offers Hear welcome if browser autoplay is blocked. Talk starts speech recognition only after a user gesture, explicit demo-voice confirmation and browser permission where supported. The transcript is reviewed before sending. Browser speech APIs can use browser-provided services; they are not Alexa. Automated speech checks use mocks, not actual microphone or audio-device verification.
