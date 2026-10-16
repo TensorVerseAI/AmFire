@@ -1,0 +1,1 @@
+export const alexaSpeech=Object.freeze({id:'alexa',status:'unconfigured',async start(){return {ok:false,status:'account_access_required',message:'Alexa speech is not connected. No verified Alexa voice embed is available for this app. Type your message instead; your microphone has not been opened.'};}});
