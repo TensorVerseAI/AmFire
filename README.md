@@ -42,9 +42,9 @@ Official project: https://github.com/TensorVerseAI/AmFire. See [competition info
 
 
 
-## Chat-first test product
+## Connected proof-of-concept sample
 
-The guest sample provides dark chat, local image/video attachments and expandable media, contextual scripted product discussion, and a disclosed US$0.99 test fee. The installed app opens a session-guarded chat when the server is configured. Alexa speech and live payments remain unavailable. See [chat and payment boundaries](docs/chat-and-payments.md). Run optional browser checks with Playwright and Edge using `node tests/chat-browser-check.mjs` and `node tests/private-chat-browser.mjs`; neither invokes a real provider.
+The guest sample shows a family gift suggestion, Yes, a clearly simulated doorstep clip, and a large success check. No real purchase or delivery occurs. Advanced test-wallet and attachment controls are hidden from this simplified sample. The installed app shows honest service status and only reports Amazon connected after a server-confirmed session. See [connection setup and blockers](docs/connected-poc.md). Run focused browser checks with `node tests/poc-browser-check.mjs` and `node tests/cinema-browser-check.mjs`; neither invokes a real provider.
 
 
 Browser checks require Playwright and Microsoft Edge installed locally; the application itself has no runtime package dependencies.
