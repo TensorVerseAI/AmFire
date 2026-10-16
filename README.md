@@ -53,3 +53,5 @@ Browser checks require Playwright and Microsoft Edge installed locally; the appl
 ## Current interactive mockup
 
 Open https://amfires.com/app/ or use the website's Try AmFire drawer. Both run the same complete simulated wish-to-delivery story with repeat shopping and optional browser demo voice. No account setup is required. See [interactive mockup implementation and verification](docs/INTERACTIVE-MOCKUP.md). Earlier real-account architecture sections describe optional reference integrations, not requirements for this mockup.
+
+Main presentation updated from the owner-supplied “AmFire woven cut v4 (1).mp4”. The original six-second opening remains; after it ends, the main video autoplays muted with a Turn sound on control. Start/Skip/Replay request sound and fullscreen after a user gesture.
