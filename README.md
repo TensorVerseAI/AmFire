@@ -12,11 +12,11 @@ npm run check
 npm test
 ```
 
-Open http://localhost:4173. Start requests fullscreen on the application shell, keeping the options menu visible over the video. Skip intro goes directly to the presentation stage. The visible side tab and navigation open the explanation page, pause/mute the video, and show a replay thumbnail. Leaving fullscreen does the same. Unsupported browsers receive a full-window player. Replay is manual; there is no idle replay timer.
+Open http://localhost:4173. Start requests fullscreen on the application shell, keeping the options menu visible over the video. Skip intro goes directly to the presentation stage. Tapping the large presentation video pauses/mutes it, moves the same video into a replay thumbnail, and slides the explanation page into view. The persistent side tab and Explore AmFire open/close the guest chat over that page. Leaving fullscreen does the same. Unsupported browsers receive a full-window player. Replay is manual; there is no idle replay timer.
 
 ## Media
 
-`public/media.json` selects opening, presentation and sample media. `presentation.src` is null until the commercial is supplied. Start or Skip requests playback with sound when configured; browser rejection presents an explicit play control. The included owner-supplied `amfire-opening.mp4` is the six-second opening, not the final commercial. Replace the manifest source/title/description and preview status when the final presentation arrives. `scene.svg` is original synthetic artwork, not a captured Fire TV frame or a photo of a real product.
+`public/media.json` selects opening, presentation and sample media. `presentation.src` currently points to the authorized opening clip as a clearly labeled interim looping video. Replace that path and set `interim`/`loop` when the final commercial is supplied. Start or Skip requests playback with sound when configured; browser rejection presents an explicit play control. The included owner-supplied `amfire-opening.mp4` is the six-second opening, not the final commercial. Replace the manifest source/title/description and preview status when the final presentation arrives. `scene.svg` is original synthetic artwork, not a captured Fire TV frame or a photo of a real product.
 
 ## Integration boundaries
 
@@ -48,3 +48,4 @@ The guest sample provides dark chat, local image/video attachments and expandabl
 
 
 Browser checks require Playwright and Microsoft Edge installed locally; the application itself has no runtime package dependencies.
+

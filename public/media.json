@@ -12,8 +12,10 @@
   },
   "repository": "https://github.com/TensorVerseAI/AmFire",
   "presentation": {
-    "src": null,
+    "src": "/assets/amfire-opening.mp4",
     "title": "AmFire. Surprise, surprise.",
-    "description": "Fire TV, Bee, Alexa and Ring bring a thoughtful gift journey together."
+    "description": "Interim looping brand clip; replace this source with the final commercial. No additional speech or audio is generated.",
+    "interim": true,
+    "loop": true
   }
 }
