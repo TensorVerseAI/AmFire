@@ -16,7 +16,7 @@ Open http://localhost:4173. Start requests fullscreen on the application shell, 
 
 ## Media
 
-`public/media.json` selects opening, presentation and sample media. `presentation.src` currently points to the authorized opening clip as a clearly labeled interim looping video. Replace that path and set `interim`/`loop` when the final commercial is supplied. Start or Skip requests playback with sound when configured; browser rejection presents an explicit play control. The included owner-supplied `amfire-opening.mp4` is the six-second opening, not the final commercial. Replace the manifest source/title/description and preview status when the final presentation arrives. `scene.svg` is original synthetic artwork, not a captured Fire TV frame or a photo of a real product.
+`public/media.json` selects the separate six-second opening, owner-supplied main presentation with voiceover, and sample media. The original MP4s are served unchanged from static assets. Start or Skip requests main playback with sound; browser rejection presents an explicit play control. Main presentation loops; minimizing or opening chat pauses and mutes the same video. `scene.svg` is original synthetic artwork, not a captured Fire TV frame or a real product photo.
 
 ## Integration boundaries
 
