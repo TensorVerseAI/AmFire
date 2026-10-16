@@ -6,7 +6,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createDurableTestStore} from './integrations/test-purchases.mjs';
 const ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),'public');
-const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.webmanifest':'application/manifest+json','.svg':'image/svg+xml','.mp4':'video/mp4','.png':'image/png'};
+const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.webmanifest':'application/manifest+json','.svg':'image/svg+xml','.mp4':'video/mp4','.webm':'video/webm','.png':'image/png'};
 export function createApp({env=process.env,fetchImpl=fetch,now=()=>Date.now()}={}){
  const purchases=env.TEST_PURCHASES==='true'&&env.AMFIRE_TEST_STORE?createDurableTestStore(env.AMFIRE_TEST_STORE):null;
  const origin=env.PUBLIC_ORIGIN||'http://localhost:4173';const secure=origin.startsWith('https://');const sessions=new Map(),states=new Map();
@@ -18,8 +18,8 @@ export function createApp({env=process.env,fetchImpl=fetch,now=()=>Date.now()}={
  return http.createServer(async(req,res)=>{
   prune();const url=new URL(req.url,'http://localhost');const p=url.pathname;
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');
-  res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
-  res.setHeader('Permissions-Policy','camera=(), microphone=(), geolocation=()');
+  res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'");
+  res.setHeader('Permissions-Policy','camera=(), microphone=(self), geolocation=()');
   const json=(status,body)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(body));};
   const redirect=(to)=>{res.writeHead(302,{Location:to,'Cache-Control':'no-store'});res.end();};
   try{
@@ -62,7 +62,7 @@ export function createApp({env=process.env,fetchImpl=fetch,now=()=>Date.now()}={
    }
    if(p.startsWith('/api/')||p.startsWith('/auth/'))return json(404,{error:'Not found'});
    if(!['GET','HEAD'].includes(req.method))return json(405,{error:'Method not allowed'});
-   let relative=decodeURIComponent(p);if(relative==='/'||relative==='/app'||relative==='/app/')relative='/index.html';
+   let relative=decodeURIComponent(p);if(relative==='/')relative='/index.html';if(relative==='/app'||relative==='/app/')relative='/app/index.html';
    const file=path.resolve(ROOT,'.'+relative);if(!file.startsWith(ROOT+path.sep))return json(403,{error:'Forbidden'});
    const st=await stat(file);if(!st.isFile())return json(404,{error:'Not found'});
    res.setHeader('Content-Type',mime[path.extname(file)]||'application/octet-stream');res.setHeader('Cache-Control','no-cache');

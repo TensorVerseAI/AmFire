@@ -49,3 +49,7 @@ The guest sample shows a family gift suggestion, Yes, a clearly simulated doorst
 
 Browser checks require Playwright and Microsoft Edge installed locally; the application itself has no runtime package dependencies.
 
+
+## Current interactive mockup
+
+Open https://amfires.com/app/ or use the website's Try AmFire drawer. Both run the same complete simulated wish-to-delivery story with repeat shopping and optional browser demo voice. No account setup is required. See [interactive mockup implementation and verification](docs/INTERACTIVE-MOCKUP.md). Earlier real-account architecture sections describe optional reference integrations, not requirements for this mockup.
