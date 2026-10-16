@@ -41,3 +41,9 @@ Code: MIT. Brand/video ownership exceptions: BRANDING.md. Google Fonts are serve
 Official project: https://github.com/TensorVerseAI/AmFire. See [competition information](docs/competition.md) and [public/private boundaries](docs/repository-boundaries.md).
 
 
+
+## Chat-first test product
+
+The guest sample provides dark chat, local image/video attachments and expandable media, contextual scripted product discussion, and a disclosed US$0.99 test fee. The installed app opens a session-guarded chat when the server is configured. Alexa speech and live payments remain unavailable. See [chat and payment boundaries](docs/chat-and-payments.md). Run optional browser checks with Playwright and Edge using `node tests/chat-browser-check.mjs` and `node tests/private-chat-browser.mjs`; neither invokes a real provider.
+
+

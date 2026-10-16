@@ -4,9 +4,11 @@ import {createReadStream} from 'node:fs';
 import {randomBytes,createHash,timingSafeEqual} from 'node:crypto';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {createDurableTestStore} from './integrations/test-purchases.mjs';
 const ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),'public');
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.webmanifest':'application/manifest+json','.svg':'image/svg+xml','.mp4':'video/mp4','.png':'image/png'};
 export function createApp({env=process.env,fetchImpl=fetch,now=()=>Date.now()}={}){
+ const purchases=env.TEST_PURCHASES==='true'&&env.AMFIRE_TEST_STORE?createDurableTestStore(env.AMFIRE_TEST_STORE):null;
  const origin=env.PUBLIC_ORIGIN||'http://localhost:4173';const secure=origin.startsWith('https://');const sessions=new Map(),states=new Map();
  const configured=Boolean(env.AMAZON_CLIENT_ID&&env.AMAZON_CLIENT_SECRET);const callback=new URL('/auth/callback',origin).href;
  const cookie=(name,value,age)=>`${name}=${value}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${age}${secure?'; Secure':''}`;
@@ -24,6 +26,16 @@ export function createApp({env=process.env,fetchImpl=fetch,now=()=>Date.now()}={
    if(p.startsWith('/auth/')||p.startsWith('/api/'))res.setHeader('Cache-Control','no-store');
    if(p==='/api/config'&&req.method==='GET')return json(200,{amazonConfigured:configured,demo:true});
    if(p==='/api/me'&&req.method==='GET'){const s=sessions.get(cookies(req).amfire_session);return s?json(200,s.profile):json(401,{error:'Authentication required'});}
+   if(p==='/api/chat/context'&&req.method==='GET'){if(!sessions.has(cookies(req).amfire_session))return json(401,{error:'Authentication required'});return json(200,{speech:{provider:'alexa',status:'unconfigured'},payments:{live:false,testEnabled:Boolean(purchases)},chat:{mode:'scripted_preview'}});}
+   if(p==='/api/test/purchases'||p.startsWith('/api/test/purchases/')){
+    const session=sessions.get(cookies(req).amfire_session);if(!session)return json(401,{error:'Authentication required'});
+    if(req.method!=='POST')return json(405,{error:'POST required'});
+    if(req.headers.origin!==origin||req.headers['x-amfire-action']!=='test-purchase')return json(403,{error:'Invalid origin'});
+    if(!purchases)return json(503,{error:'Private test wallet is not configured. Live payments are disabled.'});
+    let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>8192)return json(413,{error:'Request too large'});}
+    let input;try{input=JSON.parse(body);}catch{return json(400,{error:'Invalid JSON'});}
+    try{const result=p==='/api/test/purchases'?await purchases.create(session.profile.user_id,input):await purchases.event(session.profile.user_id,p.split('/').pop(),input);return json(200,result);}catch{return json(409,{error:'Test purchase transition or idempotency conflict'});}
+   }
    if(p==='/auth/logout'&&req.method==='POST'){if(req.headers.origin!==origin||req.headers['x-amfire-action']!=='logout')return json(403,{error:'Invalid origin'});sessions.delete(cookies(req).amfire_session);res.setHeader('Set-Cookie',cookie('amfire_session','',0));return json(200,{signedOut:true});}
    if(p==='/auth/amazon'&&req.method==='GET'){
     if(!configured)return json(503,{error:'Login with Amazon is not configured'});
